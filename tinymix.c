@@ -219,9 +219,12 @@ static int tinymix_detail_control(struct mixer *mixer, const char *control,
     num_values = mixer_ctl_get_num_values(ctl);
 
     if (type == MIXER_CTL_TYPE_BYTE) {
-        if (mixer_ctl_is_access_tlv_rw(ctl)) {
+       // Skip the TLV header for VIO snd
+       /*
+       if (mixer_ctl_is_access_tlv_rw(ctl)) {
             tlv_header_size = TLV_HEADER_SIZE;
         }
+       */
         buf = calloc(1, num_values + tlv_header_size);
         if (buf == NULL) {
             fprintf(stderr, "Failed to alloc mem for bytes %d\n", num_values);
@@ -287,13 +290,15 @@ static void tinymix_set_byte_ctl(struct mixer_ctl *ctl,
     char *end;
     unsigned int i;
     long n;
-    unsigned int *tlv, tlv_size;
+    // unsigned int *tlv, tlv_size; // Skip the TLV header for VIO snd
+    unsigned int tlv_size;
     unsigned int tlv_header_size = 0;
 
+    /*
     if (mixer_ctl_is_access_tlv_rw(ctl)) {
         tlv_header_size = TLV_HEADER_SIZE;
     }
-
+    */
     tlv_size = num_values + tlv_header_size;
 
     buf = calloc(1, tlv_size);
@@ -302,9 +307,11 @@ static void tinymix_set_byte_ctl(struct mixer_ctl *ctl,
         exit(EXIT_FAILURE);
     }
 
+    /*
     tlv = (unsigned int *)buf;
     tlv[0] = 0;
     tlv[1] = num_values;
+    */
 
     for (i = 0; i < num_values; i++) {
         errno = 0;
